@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>フリック入力タイピングゲーム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            perspective: 1000px;
+            overflow: hidden;
+        }
+
+        .game-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            text-align: center;
+            transform: rotateX(10deg);
+            transition: all 0.3s ease;
+        }
+
+        .game-container:hover {
+            transform: rotateX(0deg) scale(1.05);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+        }
+
+        #game-title {
+            color: #4a4a4a;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #timer,
+        #score {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        #current-word {
+            font-size: 36px;
+            margin: 20px 0;
+            color: #333;
+            letter-spacing: 5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        #typed-chars {
+            font-size: 20px;
+            margin: 10px 0;
+            color: #666;
+            min-height: 30px;
+        }
+
+        #start-btn,
+        #restart-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        #start-btn:hover,
+        #restart-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        #game-over {
+            display: none;
+        }
+
+        #input-field {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div id="start-screen">
+            <h1 id="game-title">フリック入力ゲーム</h1>
+            <button id="start-btn">ゲーム開始</button>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div id="timer">残り時間: 60秒</div>
+            <div id="score">スコア: 0</div>
+            <div id="current-word">タップして開始</div>
+            <input id="input-field" type="text" autocomplete="off" />
+        </div>
+
+        <div id="game-over" style="display:none;">
+            <h2>ゲーム終了!</h2>
+            <div id="final-score">スコア: 0</div>
+            <button id="restart-btn">もう一度プレイ</button>
+        </div>
+    </div>
+
+    <script>
+        // 必要なHTML要素を取得
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const gameOverScreen = document.getElementById('game-over');
+        const currentWordDisplay = document.getElementById('current-word');
+        const inputField = document.getElementById('input-field');
+        const timerDisplay = document.getElementById('timer');
+        const scoreDisplay = document.getElementById('score');
+        const finalScoreDisplay = document.getElementById('final-score');
+
+        let timeLeft = 60;
+        let score = 0;
+        let gameTimer;
+        let currentWord = '';
+
+        const words = ['こんにちは', 'ありがとう', 'さようなら', 'すみません', 'おはよう', 'こんばんわ', 'いただきます', 'ごちそうさま', 'おしまい', 'おすし', 'てぶなん', 'ねむい', 'ぴかそ', 'たにやま', 'ちんちら', 'からあげ'];
+
+        // ランダムな文字列を取得
+        function getRandomWord() {
+            return words[Math.floor(Math.random() * words.length)];
+        }
+
+        // ゲームの開始
+        function startGame() {
+            console.log('ゲーム開始');
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            gameOverScreen.style.display = 'none';
+
+            timeLeft = 60;
+            score = 0;
+            currentWord = getRandomWord();
+            currentWordDisplay.textContent = currentWord;
+
+            updateDisplays();
+
+            inputField.value = '';
+            inputField.focus();
+
+            gameTimer = setInterval(() => {
+                timeLeft--;
+                updateDisplays();
+
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // ゲーム終了
+        function endGame() {
+            clearInterval(gameTimer);
+            gameScreen.style.display = 'none';
+            gameOverScreen.style.display = 'block';
+            finalScoreDisplay.textContent = `スコア: ${score}`;
+        }
+
+        // 表示の更新
+        function updateDisplays() {
+            timerDisplay.textContent = `残り時間: ${timeLeft}秒`;
+            scoreDisplay.textContent = `スコア: ${score}`;
+        }
+
+        // 入力イベントを監視
+        inputField.addEventListener('input', () => {
+            // 入力されたテキストが現在の単語と一致した場合
+            if (inputField.value === currentWord) {
+                score++; // スコアを増加
+                currentWord = getRandomWord(); // 新しい単語を取得
+                currentWordDisplay.textContent = currentWord; // 画面に新しい単語を表示
+
+                // 入力フィールドをクリア
+                inputField.value = '';
+
+                // 入力フィールドの変換を防ぐため、少し遅延を入れる
+                setTimeout(() => {
+                    inputField.disabled = false;
+                    inputField.focus(); // 入力フィールドにフォーカスを戻す
+                }, 1); // 0ms 待機で変換を待たずにフォーカスを戻す
+            }
+        });
+
+
+        // ゲーム初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            startBtn.addEventListener('click', startGame);
+            restartBtn.addEventListener('click', startGame);
+        });
+    </script>
+</body>
+
+</html>
