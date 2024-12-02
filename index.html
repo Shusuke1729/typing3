@@ -145,8 +145,18 @@
         let gameTimer;
         let currentWord = '';
 
-        const words = ['こんにちは', 'ありがとう', 'さようなら', 'すみません', 'おはよう', 'こんばんわ', 'いただきます', 'ごちそうさま', 'おしまい', 'おすし', 'てぶなん', 'ねむい', 'ぴかそ', 'たにやま', 'ちんちら', 'からあげ'];
-
+        const words = [
+    'こんにちは', 'ありがとう', 'さようなら', 'すみません', 'おはよう', 
+    'こんばんは', 'いただきます', 'ごちそうさま', 'おしまい', 'おすし', 
+    'てんぷら', 'ねむい', 'ぴかそ', 'たいこ', 'ちいかわ', 'からあげ',
+    // 新しい単語を追加
+    'おかえり', 'おめでとう', 'がんばる', 'だいすき', 'おやすみ',
+    'わらう', 'うれしい', 'かわいい', 'たのしい', 'すごい',
+    'おはな', 'きんぎょ', 'ぱんだ', 'りんご', 'めがね',
+    'きっと', 'なるほど', 'そうだね', 'わかった', 'おもしろい',
+    'あたたかい', 'やさしい', 'げんき', 'おいしい', 'はじめまして',
+    'たのしむ', 'えがお', 'きれい', 'あいさつ', 'にっこり'
+];
         // ランダムな文字列を取得
         function getRandomWord() {
             return words[Math.floor(Math.random() * words.length)];
@@ -166,7 +176,9 @@
 
             updateDisplays();
 
+            // 入力フィールドを完全にクリアする
             inputField.value = '';
+            inputField.setAttribute('placeholder', '');
             inputField.focus();
 
             gameTimer = setInterval(() => {
@@ -201,17 +213,19 @@
                 currentWord = getRandomWord(); // 新しい単語を取得
                 currentWordDisplay.textContent = currentWord; // 画面に新しい単語を表示
 
-                // 入力フィールドをクリア
-                inputField.value = '';
+                // より確実な入力クリア方法
+                requestAnimationFrame(() => {
+                    inputField.value = '';
+                    inputField.setAttribute('placeholder', '');
+                });
 
-                // 入力フィールドの変換を防ぐため、少し遅延を入れる
+                // ブラウザの入力状態をリセット
                 setTimeout(() => {
-                    inputField.disabled = false;
-                    inputField.focus(); // 入力フィールドにフォーカスを戻す
-                }, 500); // 0ms 待機で変換を待たずにフォーカスを戻す
+                    inputField.blur(); // フォーカスを外す
+                    inputField.focus(); // フォーカスを戻す
+                }, 10);
             }
         });
-
 
         // ゲーム初期化
         document.addEventListener('DOMContentLoaded', () => {
