@@ -128,111 +128,102 @@
     </div>
 
     <script>
-        // 必要なHTML要素を取得
-        const startBtn = document.getElementById('start-btn');
-        const restartBtn = document.getElementById('restart-btn');
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const gameOverScreen = document.getElementById('game-over');
-        const currentWordDisplay = document.getElementById('current-word');
-        const inputField = document.getElementById('input-field');
-        const timerDisplay = document.getElementById('timer');
-        const scoreDisplay = document.getElementById('score');
-        const finalScoreDisplay = document.getElementById('final-score');
+    // 必要なHTML要素を取得
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const gameOverScreen = document.getElementById('game-over');
+    const currentWordDisplay = document.getElementById('current-word');
+    const inputField = document.getElementById('input-field');
+    const timerDisplay = document.getElementById('timer');
+    const scoreDisplay = document.getElementById('score');
+    const finalScoreDisplay = document.getElementById('final-score');
 
-        let timeLeft = 60;
-        let score = 0;
-        let gameTimer;
-        let currentWord = '';
+    let timeLeft = 60;
+    let score = 0;
+    let gameTimer;
+    let currentWord = '';
 
-        const words = [
-    'こんにちは', 'ありがとう', 'さようなら', 'すみません', 'おはよう', 
-    'こんばんは', 'いただきます', 'ごちそうさま', 'おしまい', 'おすし', 
-    'てんぷら', 'ねむい', 'ぴかそ', 'たいこ', 'ちいかわ', 'からあげ',
-    // 新しい単語を追加
-    'おかえり', 'おめでとう', 'がんばる', 'だいすき', 'おやすみ',
-    'わらう', 'うれしい', 'かわいい', 'たのしい', 'すごい',
-    'おはな', 'きんぎょ', 'ぱんだ', 'りんご', 'めがね',
-    'きっと', 'なるほど', 'そうだね', 'わかった', 'おもしろい',
-    'あたたかい', 'やさしい', 'げんき', 'おいしい', 'はじめまして',
-    'たのしむ', 'えがお', 'きれい', 'あいさつ', 'にっこり'
-];
-        // ランダムな文字列を取得
-        function getRandomWord() {
-            return words[Math.floor(Math.random() * words.length)];
-        }
+    const words = [
+        'こんにちは', 'ありがとう', 'さようなら', 'すみません', 'おはよう',
+        'こんばんは', 'いただきます', 'ごちそうさま', 'おしまい', 'おすし',
+        'てんぷら', 'ねむい', 'ぴかそ', 'たいこ', 'ちいかわ', 'からあげ',
+        'おかえり', 'おめでとう', 'がんばる', 'だいすき', 'おやすみ',
+        'わらう', 'うれしい', 'かわいい', 'たのしい', 'すごい',
+        'おはな', 'きんぎょ', 'ぱんだ', 'りんご', 'めがね',
+        'きっと', 'なるほど', 'そうだね', 'わかった', 'おもしろい',
+        'あたたかい', 'やさしい', 'げんき', 'おいしい', 'はじめまして',
+        'たのしむ', 'えがお', 'きれい', 'あいさつ', 'にっこり'
+    ];
 
-        // ゲームの開始
-        function startGame() {
-            console.log('ゲーム開始');
-            startScreen.style.display = 'none';
-            gameScreen.style.display = 'block';
-            gameOverScreen.style.display = 'none';
+    // ランダムな文字列を取得
+    function getRandomWord() {
+        return words[Math.floor(Math.random() * words.length)];
+    }
 
-            timeLeft = 60;
-            score = 0;
-            currentWord = getRandomWord();
-            currentWordDisplay.textContent = currentWord;
+    // ゲームの開始
+    function startGame() {
+        startScreen.style.display = 'none';
+        gameScreen.style.display = 'block';
+        gameOverScreen.style.display = 'none';
 
+        timeLeft = 60;
+        score = 0;
+        currentWord = getRandomWord();
+        currentWordDisplay.textContent = currentWord;
+
+        updateDisplays();
+
+        // 入力フィールドを完全にクリアする
+        inputField.value = '';
+        inputField.focus();
+
+        gameTimer = setInterval(() => {
+            timeLeft--;
             updateDisplays();
 
-            // 入力フィールドを完全にクリアする
-            inputField.value = '';
-            inputField.setAttribute('placeholder', '');
-            inputField.focus();
-
-            gameTimer = setInterval(() => {
-                timeLeft--;
-                updateDisplays();
-
-                if (timeLeft <= 0) {
-                    endGame();
-                }
-            }, 1000);
-        }
-
-        // ゲーム終了
-        function endGame() {
-            clearInterval(gameTimer);
-            gameScreen.style.display = 'none';
-            gameOverScreen.style.display = 'block';
-            finalScoreDisplay.textContent = `スコア: ${score}`;
-        }
-
-        // 表示の更新
-        function updateDisplays() {
-            timerDisplay.textContent = `残り時間: ${timeLeft}秒`;
-            scoreDisplay.textContent = `スコア: ${score}`;
-        }
-
-        // 入力イベントを監視
-        inputField.addEventListener('input', () => {
-            // 入力されたテキストが現在の単語と一致した場合
-            if (inputField.value === currentWord) {
-                score++; // スコアを増加
-                currentWord = getRandomWord(); // 新しい単語を取得
-                currentWordDisplay.textContent = currentWord; // 画面に新しい単語を表示
-
-                // より確実な入力クリア方法
-                requestAnimationFrame(() => {
-                    inputField.value = '';
-                    inputField.setAttribute('placeholder', '');
-                });
-
-                // ブラウザの入力状態をリセット
-                setTimeout(() => {
-                    inputField.blur(); // フォーカスを外す
-                    inputField.focus(); // フォーカスを戻す
-                }, 10);
+            if (timeLeft <= 0) {
+                endGame();
             }
-        });
+        }, 1000);
+    }
 
-        // ゲーム初期化
-        document.addEventListener('DOMContentLoaded', () => {
-            startBtn.addEventListener('click', startGame);
-            restartBtn.addEventListener('click', startGame);
-        });
-    </script>
+    // ゲーム終了
+    function endGame() {
+        clearInterval(gameTimer);
+        gameScreen.style.display = 'none';
+        gameOverScreen.style.display = 'block';
+        finalScoreDisplay.textContent = `スコア: ${score}`;
+    }
+
+    // 表示の更新
+    function updateDisplays() {
+        timerDisplay.textContent = `残り時間: ${timeLeft}秒`;
+        scoreDisplay.textContent = `スコア: ${score}`;
+    }
+
+    // 入力イベントを監視
+    inputField.addEventListener('input', () => {
+        // 入力されたテキストが現在の単語と一致した場合
+        if (inputField.value === currentWord) {
+            score++; // スコアを増加
+            currentWord = getRandomWord(); // 新しい単語を取得
+            currentWordDisplay.textContent = currentWord; // 画面に新しい単語を表示
+            inputField.value = ''; // 入力フィールドをクリア
+            
+            // フィールドにフォーカスを維持
+            inputField.focus();
+        }
+    });
+
+    // ゲーム初期化
+    document.addEventListener('DOMContentLoaded', () => {
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+    });
+</script>
+    
 </body>
 
 </html>
